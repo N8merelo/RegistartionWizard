@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RegistartionWizard.Data;
 using RegistartionWizard.Models;
 using RegistrationWizard.Models;
+using RegistrationWizard.Dtos;
 
 namespace RegistartionWizard.Controllers
 {
@@ -19,15 +20,23 @@ namespace RegistartionWizard.Controllers
 
         // GET: api/companies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Company>>> GetCompanies()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<CompanyDto>>> GetCompanies()
         {
             var companies = await _db.Companies
                 .Include(c => c.Industry)
-                .Include(c => c.Users)
+                .Select(c => new CompanyDto
+                {
+                    CompanyId = c.CompanyId,
+                    Name = c.Name,
+                    IndustryId = c.IndustryId,
+                    IndustryName = c.Industry.Name
+                })
                 .ToListAsync();
 
             return Ok(companies);
         }
+
 
         // GET: api/companies/{id}
         [HttpGet("{id}")]
